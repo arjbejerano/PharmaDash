@@ -1,0 +1,66 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background-color: #f4f7f9;
+}
+
+header {
+    background-color: #007bff;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+main {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+section {
+    background-color: white;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+.alert-low-stock {
+    background-color: #ffe0e0; /* Highlight low stock rows */
+    font-weight: bold;
+}
+
+.alert-text {
+    color: red;
+    font-weight: bold;
+}
+
+.ok-text {
+    color: green;
+}
+
+.chart-container {
+    max-width: 800px;
+    margin: 20px auto;
+}
+
+#drug-selector {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}

@@ -1,0 +1,6 @@
+Flask
+pandas
+numpy
+scikit-learn
+# For time-series, use statsmodels for a simpler start, or install prophet
+statsmodels

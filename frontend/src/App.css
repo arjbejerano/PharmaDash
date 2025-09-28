@@ -1,0 +1,178 @@
+/* Global Reset and Typography */
+body {
+    margin: 0;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+      sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Updated: Lighter body background for higher contrast with sections */
+    background-color: #f4f6f9; 
+}
+
+.dashboard-container {
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+/* Header (High Contrast) */
+.header {
+    /* Updated: Deeper corporate blue for strong contrast */
+    background-color: #1a437f; 
+    color: white;
+    padding: 30px 20px;
+    text-align: center;
+    margin-bottom: 30px;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+}
+
+.header h1 {
+    margin: 0;
+    font-size: 2.2em;
+}
+
+.header p {
+    margin-top: 8px;
+    font-size: 1.1em;
+    opacity: 0.9;
+}
+
+/* Section Styling (Clear Boxes on Light Background) */
+.inventory-section, .forecast-section {
+    background-color: white;
+    padding: 25px;
+    margin-bottom: 30px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.inventory-section h2, .forecast-section h2 {
+    color: #343a40; /* Dark text for contrast */
+    margin-top: 0;
+    border-bottom: 2px solid #e9ecef;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+/* Table Styling */
+table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+th, td {
+    border: 1px solid #dee2e6;
+    padding: 12px;
+    text-align: left;
+    color: #212529; /* Dark text for high contrast */
+}
+
+th {
+    background-color: #e9ecef; /* Light gray header */
+    color: #1a437f; /* Blue header text */
+    font-weight: 700;
+}
+
+/* Updated: Zebra stripping for table rows (improves readability) */
+tbody tr:nth-child(even) {
+    background-color: #f8f9fa; /* Slightly darker background for even rows */
+}
+
+/* Automation Visuals (Ensuring alerts stand out) */
+.alert-low-stock {
+    background-color: #fcebeb; /* Very light red background */
+    font-weight: bold;
+}
+
+.alert-low-stock:hover {
+    background-color: #f9dcdc;
+}
+
+.alert-text {
+    color: #c82333; /* Strong, dark red for warning text */
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.ok-text {
+    color: #1e7e34; /* Strong, dark green for success text */
+    font-weight: 600;
+}
+
+/* Filter Controls */
+.filter-controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    align-items: center;
+}
+
+.filter-button, .location-filter, .drug-selector {
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 1px solid #ced4da;
+    color: #343a40; /* Dark text on buttons */
+}
+
+.filter-button {
+    background-color: #f0f0f0;
+}
+
+.filter-button.active {
+    background-color: #ffc107; /* Amber for Alert */
+    border-color: #e0a800;
+    color: #333;
+    box-shadow: 0 2px 4px rgba(255, 193, 7, 0.4);
+}
+
+.filter-button:hover {
+    background-color: #e2e6ea;
+}
+
+.location-filter, .drug-selector {
+    background-color: white;
+}
+
+.item-count {
+    margin-left: auto;
+    font-size: 1em;
+    color: #495057;
+}
+
+.forecast-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+/* Chart Container */
+.chart-container-wrapper {
+    height: 400px;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+}
+
+.chart-status {
+    text-align: center;
+    color: #6c757d;
+    padding: 20px;
+}
+
+.loading, .error {
+    text-align: center;
+    padding: 40px;
+    font-size: 1.5em;
+    color: #c82333;
+    background-color: #fff3f5;
+    border: 2px solid #f5c6cb;
+    border-radius: 12px;
+}

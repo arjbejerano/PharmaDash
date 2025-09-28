@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pharma SC Optimization Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Supply Chain Digitalization Dashboard</h1>
+    </header>
+    <main>
+        <section class="inventory-status">
+            <h2>Inventory Status & Alerts</h2>
+            <div id="inventory-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Drug Name</th>
+                            <th>Stock Level</th>
+                            <th>Reorder Point</th>
+                            <th>Location</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inventory-body">
+                        </tbody>
+                </table>
+            </div>
+        </section>
+
+        <hr>
+
+        <section class="forecasting">
+            <h2>7-Day Demand Forecast</h2>
+            <select id="drug-selector">
+                </select>
+            <div class="chart-container">
+                <canvas id="forecastChart"></canvas>
+            </div>
+        </section>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
