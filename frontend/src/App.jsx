@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
-// Import the separated ForecastChart component (Updated to include .jsx extension for reliable resolution)
 import ForecastChart from './ForecastChart.jsx';
 import './App.css';
-// IMPORTANT: Use your actual live Render API URL here
 const API_BASE_URL = 'https://pharma-supply-chain-dashboard.onrender.com/api';
 
 
