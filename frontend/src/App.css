@@ -110,7 +110,7 @@ tbody tr:nth-child(even) {
     /*padding: 4px 8px;*/ 
     /*border-radius: 9999px;*/ 
     display: inline-flex;
-    background-color: #d4edda;
+    /*background-color: #d4edda;*/
 }
 
 /* Filter Controls */
