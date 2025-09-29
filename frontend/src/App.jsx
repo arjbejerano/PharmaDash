@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 // Import the separated ForecastChart component (Updated to include .jsx extension for reliable resolution)
 import ForecastChart from './ForecastChart.jsx';
-
+import './App.css';
 // IMPORTANT: Use your actual live Render API URL here
 const API_BASE_URL = 'https://pharma-supply-chain-dashboard.onrender.com/api';
 
@@ -79,89 +79,73 @@ function App() {
           }
         `}
       </style>
-      <script src="https://cdn.tailwindcss.com"></script>
       
       <div className="min-h-screen bg-gray-50 p-4 sm:p-8 font-inter antialiased">
         
-        <div className="max-w-6xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden">
+        <div className="dashboard-container">
           
-          <header className="p-6 bg-indigo-600 text-white shadow-lg">
-            <h1 className="text-3xl font-extrabold">Pharma Supply Chain Digital Dashboard</h1>
-            <p className="text-indigo-200 mt-1 text-sm">Leveraging Prophet AI for Forecasting and SQL for Real-Time Inventory Tracking</p>
+          <header className="header">
+            <h1>Pharma Supply Chain Digital Dashboard</h1>
+            <p>Leveraging Prophet AI for Forecasting and SQL for Real-Time Inventory Tracking</p>
           </header>
 
           {/* ---------------------------------------------------- */}
           {/* INVENTORY STATUS & AUTOMATION SECTION */}
-          <section className="p-6 border-b border-gray-100">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4 border-b pb-2 text-indigo-800">Inventory Status & Automated Alerts</h2>
+          <section className="inventory-section">
+            <h2>Inventory Status & Automated Alerts</h2>
 
-            {/* Filter Controls */}
-            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center mb-6 bg-indigo-50 p-4 rounded-xl shadow-inner border border-indigo-200">
+            {/* Filter Controls for Digitalization */}
+            <div className="filter-controls">
               <button
-                className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 text-sm shadow-md 
-                  ${showOnlyAlerts 
-                    ? 'bg-red-600 text-white hover:bg-red-700' 
-                    : 'bg-indigo-600 text-white hover:bg-indigo-700'
-                  }`}
+                className={`filter-button ${showOnlyAlerts ? 'active' : ''}`}
                 onClick={() => setShowOnlyAlerts(!showOnlyAlerts)}
               >
-                {showOnlyAlerts ? 'Showing Alerts Only (Click to Show All)' : 'Show Only Urgent Reorders'}
+                {showOnlyAlerts ? 'Showing Alerts Only' : 'Show Only Urgent Reorders'}
               </button>
               
               <select 
-                className="px-4 py-2 border border-indigo-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition-colors text-sm text-gray-700"
+                className="location-filter"
                 value={locationFilter} 
                 onChange={(e) => setLocationFilter(e.target.value)}
               >
                 {uniqueLocations.map(loc => (
-                  <option key={loc} value={loc} className="text-gray-900">Filter by: {loc}</option>
+                  <option key={loc} value={loc}>{loc}</option>
                 ))}
               </select>
 
               {/* Display the filtered data count */}
-              <p className="item-count text-indigo-800 ml-auto font-medium text-sm">
-                Showing <strong className="text-indigo-900">{filteredInventory.length}</strong> of <strong className="text-indigo-900">{inventoryData.length}</strong> Items
-              </p>
+              <p className="item-count">Showing <strong>{filteredInventory.length}</strong> of <strong>{inventoryData.length}</strong> Items</p>
             </div>
 
-            {/* Inventory Table */}
-            <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-lg">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-indigo-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-indigo-700 uppercase tracking-wider">Drug Name</th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-indigo-700 uppercase tracking-wider">Stock Level</th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-indigo-700 uppercase tracking-wider">Reorder Point</th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-indigo-700 uppercase tracking-wider">Location</th>
-                    <th className="px-6 py-3 text-left text-xs font-bold text-indigo-700 uppercase tracking-wider">Status</th>
+            {/* Inventory Table (Uses filteredInventory) */}
+            <table>
+              <thead>
+                <tr>
+                  <th>Drug Name</th>
+                  <th>Stock Level</th>
+                  <th>Reorder Point</th>
+                  <th>Location</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredInventory.map(drug => (
+                  <tr 
+                    key={drug.id} 
+                    className={drug.alert ? 'alert-low-stock' : 'status-ok'}
+                  >
+                    <td>{drug.name}</td>
+                    <td>{drug.stock.toLocaleString()}</td>
+                    <td>{drug.reorder_point.toLocaleString()}</td>
+                    <td>{drug.location}</td>
+                    <td className={drug.alert ? 'alert-text' : 'ok-text'}>
+                      {drug.alert ? 'URGENT REORDER' : 'OK'}
+                    </td>
                   </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-100">
-                  {filteredInventory.map(drug => (
-                    <tr 
-                      key={drug.id} 
-                      className={`cursor-pointer transition-all duration-150 hover:bg-yellow-50 
-                          ${drug.alert ? 'bg-red-50 hover:bg-red-100' : ''} 
-                          ${selectedDrugId === drug.id ? 'bg-indigo-100 font-semibold shadow-inner' : ''}`}
-                      onClick={() => setSelectedDrugId(drug.id)}
-                    >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{drug.name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{drug.stock.toLocaleString()}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{drug.reorder_point.toLocaleString()}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{drug.location}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        <span className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full 
-                          ${drug.alert ? 'bg-red-200 text-red-900' : 'bg-green-100 text-green-800'}`}>
-                          {drug.alert ? 'URGENT REORDER' : 'OK'}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                ))}
+              </tbody>
+            </table>
           </section>
-
           {/* ---------------------------------------------------- */}
           {/* DEMAND FORECASTING & ANALYTICS SECTION */}
           <section className="p-6">
