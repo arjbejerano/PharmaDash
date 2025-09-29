@@ -100,7 +100,7 @@ tbody tr:nth-child(even) {
     font-weight: 700;
     text-transform: uppercase;
     /*adding: 4px 8px;*/ 
-    border-radius: 9999px; 
+    /*border-radius: 9999px;*/ 
     display: inline-flex;
 }
 
@@ -108,7 +108,7 @@ tbody tr:nth-child(even) {
     color: #1e7e34; 
     font-weight: 600;
     /*padding: 4px 8px;*/ 
-    border-radius: 9999px; 
+    /*border-radius: 9999px;*/ 
     display: inline-flex;
     background-color: #d4edda;
 }
