@@ -1,146 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Line } from 'react-chartjs-2';
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js';
-
-// Register Chart.js components required for the Line chart
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+// Import the separated ForecastChart component (Updated to include .jsx extension for reliable resolution)
+import ForecastChart from './ForecastChart.jsx';
 
 // IMPORTANT: Use your actual live Render API URL here
 const API_BASE_URL = 'https://pharma-supply-chain-dashboard.onrender.com/api';
-
-// --- ForecastChart Component Logic (Moved Inline) ---
-
-const ForecastChart = ({ API_BASE_URL, selectedDrugId }) => {
-    const [chartData, setChartData] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [drugName, setDrugName] = useState('Loading...');
-
-    useEffect(() => {
-        if (!selectedDrugId || !API_BASE_URL) {
-            setChartData(null);
-            return;
-        }
-
-        setLoading(true);
-        setError(null);
-        setChartData(null);
-
-        const fetchForecast = async () => {
-            try {
-                // Construct the full forecast URL 
-                const url = `${API_BASE_URL.replace('/api', '')}/api/forecast/${selectedDrugId}`;
-                const response = await fetch(url);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-
-                // Extract dates and predicted sales for the chart
-                const dates = data.forecast.map(item => item.date);
-                const sales = data.forecast.map(item => item.predicted_sales);
-
-                setDrugName(data.drug_name);
-                setChartData({
-                    labels: dates,
-                    datasets: [
-                        {
-                            label: 'Predicted Daily Demand (Units)',
-                            data: sales,
-                            borderColor: 'rgba(59, 130, 246, 1)', // Tailwind blue-500
-                            backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                            tension: 0.2,
-                            fill: true,
-                        },
-                    ],
-                });
-            } catch (e) {
-                console.error("Forecast fetch failed:", e);
-                setError(`Could not load forecast data. (${e.message})`);
-                setDrugName('Error Loading');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchForecast();
-    }, [selectedDrugId, API_BASE_URL]);
-
-    // Chart options for aesthetics
-    const options = {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: {
-                position: 'top',
-                labels: {
-                    color: '#4b5563', // gray-600
-                    font: { size: 14, family: 'Inter, sans-serif' }
-                }
-            },
-            title: {
-                display: true,
-                text: `${drugName} - 7-Day Demand Forecast`,
-                color: '#1f2937', // gray-800
-                font: { size: 18, weight: 'bold', family: 'Inter, sans-serif' }
-            },
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                title: { display: true, text: 'Predicted Units (yhat)', color: '#6b7280' },
-                grid: { color: '#e5e7eb' },
-                ticks: { color: '#374151' }
-            },
-            x: {
-                title: { display: true, text: 'Date', color: '#6b7280' },
-                ticks: { color: '#374151' }
-            }
-        }
-    };
-
-    if (loading) {
-        return (
-            <div className="text-center p-6 text-gray-500">
-                <p>Running Prophet model...</p>
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mt-4"></div>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="text-center p-6 bg-red-100 text-red-700 rounded-lg border border-red-300">
-                <p className="font-bold">Forecast Error</p>
-                <p className="text-sm">{error}</p>
-            </div>
-        );
-    }
-
-    if (!chartData) {
-        return (
-            <div className="text-center p-6 text-gray-500 border border-gray-200 rounded-lg">
-                <p>Select an inventory item to view the 7-day demand forecast.</p>
-            </div>
-        );
-    }
-
-    return (
-        <div className="h-full w-full p-4">
-            <div style={{ height: '350px' }}>
-                <Line options={options} data={chartData} />
-            </div>
-        </div>
-    );
-};
-
-// --- End of ForecastChart Logic ---
 
 
 function App() {
@@ -157,22 +20,35 @@ function App() {
   // Effect hook runs once after the component mounts to fetch data
   useEffect(() => {
     const fetchInventory = async () => {
-      try {
-        const response = await fetch(`${API_BASE_URL}/inventory`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+      // Exponential backoff logic for API call robustness
+      const maxRetries = 3;
+      let currentRetry = 0;
+
+      while (currentRetry < maxRetries) {
+        try {
+          const response = await fetch(`${API_BASE_URL}/inventory`);
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          setInventoryData(data);
+          if (data.length > 0) {
+            setSelectedDrugId(data[0].id); // Set first drug as default for chart
+          }
+          setError(null);
+          setLoading(false);
+          return; // Exit on success
+        } catch (e) {
+          currentRetry++;
+          if (currentRetry >= maxRetries) {
+            console.error("Could not fetch inventory after retries:", e);
+            setError("Failed to connect to the backend server after retrying. Is Flask running?");
+            setLoading(false);
+            return;
+          }
+          // Wait with exponential backoff before retrying
+          await new Promise(resolve => setTimeout(resolve, 1000 * Math.pow(2, currentRetry))); 
         }
-        const data = await response.json();
-        setInventoryData(data);
-        if (data.length > 0) {
-          setSelectedDrugId(data[0].id); // Set first drug as default for chart
-        }
-        setError(null);
-      } catch (e) {
-        console.error("Could not fetch inventory:", e);
-        setError("Failed to connect to the backend server. Is Flask running?");
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -193,7 +69,16 @@ function App() {
 
   return (
     <>
-      {/* FIX: Moved Tailwind Script outside the main component JSX structure */}
+      {/* CRITICAL: These elements remain here to ensure global styling and responsiveness are correctly initialized */}
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <style>
+        {`
+          body, html, #root {
+            background-color: #f9fafb !important; /* Forces bg-gray-50 */
+            font-family: 'Inter', sans-serif;
+          }
+        `}
+      </style>
       <script src="https://cdn.tailwindcss.com"></script>
       
       <div className="min-h-screen bg-gray-50 p-4 sm:p-8 font-inter antialiased">
@@ -298,7 +183,7 @@ function App() {
                 </select>
             </div>
 
-            {/* Forecast Chart Rendering - Passing API_BASE_URL and selectedDrugId */}
+            {/* Forecast Chart Rendering - Now imported from separate file */}
             {selectedDrugId && (
                 <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-100" style={{ minHeight: '400px' }}>
                     <ForecastChart 
