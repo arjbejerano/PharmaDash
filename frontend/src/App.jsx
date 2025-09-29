@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import ForecastChart from './ForecastChart';
+import ForecastChart from './ForecastChart.jsx';
 import './App.css'; 
 
 const API_BASE_URL = 'https://pharma-supply-chain-dashboard.onrender.com/api';
