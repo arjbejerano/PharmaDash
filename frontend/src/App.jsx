@@ -148,14 +148,14 @@ function App() {
           </section>
           {/* ---------------------------------------------------- */}
           {/* DEMAND FORECASTING & ANALYTICS SECTION */}
-          <section className="p-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4 border-b pb-2 text-indigo-800">Demand Forecast (Prophet Analytics)</h2>
+          <section className="forecast-section">
+            <h2>7-Day Demand Forecast (Prophet Analytics)</h2>
             
-            <div className="flex flex-col md:flex-row gap-4 items-start md:items-center mb-6">
-                <label htmlFor="drug-select" className="font-medium text-gray-700 whitespace-nowrap">Select Drug for Forecast:</label>
+            <div className="forecast-controls">
+                <label htmlFor="drug-select">Select Drug for Forecast:</label>
                 <select
                     id="drug-select"
-                    className="px-4 py-2 border border-indigo-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500 transition-colors w-full md:w-auto text-gray-700"
+                    className="drug-selector"
                     value={selectedDrugId}
                     onChange={(e) => setSelectedDrugId(e.target.value)}
                 >
