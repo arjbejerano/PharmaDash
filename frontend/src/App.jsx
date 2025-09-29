@@ -152,7 +152,7 @@ function App() {
             <h2>7-Day Demand Forecast (Prophet Analytics)</h2>
             
             <div className="forecast-controls">
-                <label htmlFor="drug-select">Select Drug for Forecast:</label>
+                <label htmlFor="drug-select" className="forecast-label">Select Drug for Forecast:</label>
                 <select
                     id="drug-select"
                     className="drug-selector"
