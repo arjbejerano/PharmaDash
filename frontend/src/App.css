@@ -10,7 +10,7 @@ body {
 }
 
 .dashboard-container {
-    max-width: 1200px;
+    max-width: 100%;
     margin: 40px auto;
     padding: 20px;
 }
@@ -101,7 +101,7 @@ tbody tr:nth-child(even) {
     text-transform: uppercase;
     /*adding: 4px 8px;*/ 
     /*border-radius: 9999px;*/ 
-    display: inline-flex;
+    /*display: inline-flex;*/
 }
 
 .ok-text {
