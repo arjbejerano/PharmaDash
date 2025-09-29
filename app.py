@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from flask import Flask, jsonify, request
 from prophet import Prophet
 import logging # Added for better error handling/output
+import os # NECESSARY: For reading the port from the environment variable
 
 # SQLAlchemy Imports
 from sqlalchemy import create_engine, Column, Integer, String
@@ -169,5 +170,6 @@ def get_demand_forecast(drug_id):
 
 # --- 3.3 RUN THE FLASK APP ---
 if __name__ == '__main__':
-    # Add a CORS header for easy local testing with the frontend
-    app.run(debug=True, port=5000)
+    # MANDATORY: Bind to 0.0.0.0 and read port from environment for cloud deployment (e.g., Render)
+    # The default port 5000 is used for local testing if the PORT environment variable is missing.
+    app.run(host='0.0.0.0', port=os.environ.get('PORT', 5000))
