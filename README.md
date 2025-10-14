@@ -64,17 +64,3 @@ The project follows a **decoupled client-server architecture** focused exclusive
 - **Cross-Origin Communication**: [Flask-CORS](https://flask-cors.readthedocs.io/) for secure frontend-backend interaction  
 
 ---
-
-## 🌐 Deployment Strategy
-
-The project is structured for **hybrid deployment**:
-
-- **Frontend**:  
-  - Deployed to a static hosting service (e.g., **GitHub Pages**)  
-
-- **Backend**:  
-  - Deployed as a dynamic web service (e.g., **Render**, or equivalent hosting provider)  
-
-This ensures the **analytical engine** (Flask + Prophet) remains available to power the dashboard.  
-
----
