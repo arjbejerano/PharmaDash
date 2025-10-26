@@ -1,58 +1,67 @@
-# Project Build Guide
+# 💊 Pharma Supply Chain Digital Dashboard
 
-## Tech Stack
+The **Pharma Supply Chain Digital Dashboard** is a full-featured web application built to modernize pharmaceutical inventory management.  
+It combines **real-time stock monitoring**, **AI-inspired demand forecasting**, and **automated reorder alerts** — enabling smarter, data-driven supply chain decisions for pharmaceutical distributors, hospitals, and healthcare logistics teams.
 
-This project is built using the following technologies:
+---
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🚀 Core Features Implemented
 
-## Prerequisites
+### 🧾 1. Real-Time Inventory Monitoring
+- ✅ Dynamic inventory table with **25 pharmaceutical products**
+- ✅ Displays **current stock**, **reorder point**, and **warehouse location**
+- ✅ **Automated URGENT REORDER** alerts for low-stock items
+- ✅ **Interactive filtering** by alert status and location
+- ✅ **Auto-refresh every 30 seconds** for live updates
 
-Make sure your system has Node.js and npm installed.
+### 📈 2. Advanced Demand Forecasting
+- ✅ **7-day demand forecast visualization** using Chart.js
+- ✅ **Prophet-like algorithm simulation** for time-series analysis
+- ✅ Includes **confidence intervals** and **historical trend comparison**
+- ✅ **Export forecast data as CSV**
+- ✅ **On-demand forecast generation** for selected products
 
-We recommend using nvm to install Node.js: [nvm Installation Guide](https://github.com/nvm-sh/nvm#installing-and-updating)
+### 🧩 3. Dashboard Layout & UX
+- ✅ **Two-column responsive layout** (Inventory + Forecast)
+- ✅ **Key metrics overview cards** (e.g., alert count, accuracy rate, locations)
+- ✅ **Mobile-friendly interface**
+- ✅ **Professional styling** optimized for the pharmaceutical industry
 
-## Install Dependencies
+---
 
-```sh
-npm install
-```
+## 📊 Dashboard Highlights
 
-## Development Server
+| Metric | Value |
+|--------|--------|
+| ⚠️ Products flagged for urgent reorder | **12** |
+| 📈 Forecast accuracy (simulated Prophet) | **87%** |
+| 🏭 Active locations | **3** (Warehouse A, Distribution Hub B, Warehouse C) |
+| 🔄 Auto-refresh interval | Every **30 seconds** |
 
-Start the development server with hot reload and instant preview:
+---
 
-```sh
-npm run dev
-```
+## 🛠️ Technical Implementation
 
-## Build Project
+### 🧱 Frontend Architecture
+| Layer | Technology |
+|-------|-------------|
+| Framework | **React (Vite + TypeScript)** |
+| Charts | **Chart.js** |
+| Styling | **Tailwind CSS + shadcn/ui** |
+| Data Simulation | Mock API service simulating backend endpoints |
+| Build Tool | Vite for blazing-fast dev and build times |
 
-Build for production:
+### 📊 Data & Analytics
+- 25 sample products with stock, reorder, and location data  
+- Forecasting engine simulating **Prophet algorithm** behavior  
+- Confidence interval calculations and simulated seasonality  
+- Color-coded alerts for immediate visual feedback  
 
-```sh
-npm run build
-```
+---
 
-## Preview Build
+## ⚙️ Installation & Setup
 
-Preview the built project:
-
-```sh
-npm run preview
-```
-
-## Project Structure
-
-```
-src/
-├── components/     # UI Components
-├── pages/         # Page Components
-├── hooks/         # Custom Hooks
-├── lib/           # Utility Library
-└── main.tsx       # Application Entry Point
-```
+### 1️⃣ Clone the repository
+```bash
+git clone https://github.com/<your-username>/<your-repo-name>.git
+cd <your-repo-name>
