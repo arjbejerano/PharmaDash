@@ -1,7 +1,9 @@
-import { InventoryItem } from '@/types/inventory';
+import { InventoryItem, InventoryItemInput, InventoryStats } from '@/types/inventory';
+
+const STORAGE_KEY = 'pharmadash-inventory';
 
 // Sample pharmaceutical inventory data (20-30 products)
-export const INVENTORY_DATA: InventoryItem[] = [
+const SEED_INVENTORY_DATA: InventoryItem[] = [
   {
     id: 'DRUG001',
     name: 'Amoxicillin 500mg',
@@ -279,18 +281,125 @@ export const INVENTORY_DATA: InventoryItem[] = [
   }
 ];
 
-// Update isUrgentReorder based on current stock vs reorder point
-INVENTORY_DATA.forEach(item => {
-  item.isUrgentReorder = item.currentStock <= item.reorderPoint;
+const applyUrgentFlag = (item: InventoryItem): InventoryItem => ({
+  ...item,
+  isUrgentReorder: item.currentStock <= item.reorderPoint,
 });
 
-export const getInventoryData = () => {
-  return INVENTORY_DATA.map(item => ({
+const normalizeInventory = (items: InventoryItem[]): InventoryItem[] =>
+  items.map(applyUrgentFlag);
+
+const cloneSeedData = (): InventoryItem[] =>
+  normalizeInventory(
+    SEED_INVENTORY_DATA.map(item => ({
+      ...item,
+      lastUpdated: new Date().toISOString(),
+    }))
+  );
+
+let inventoryStore: InventoryItem[] = cloneSeedData();
+
+const persistInventory = () => {
+  if (typeof window === 'undefined') return;
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(inventoryStore));
+};
+
+const loadInventoryFromStorage = (): InventoryItem[] | null => {
+  if (typeof window === 'undefined') return null;
+
+  const stored = localStorage.getItem(STORAGE_KEY);
+  if (!stored) return null;
+
+  try {
+    const parsed = JSON.parse(stored) as InventoryItem[];
+    if (!Array.isArray(parsed) || parsed.length === 0) return null;
+    return normalizeInventory(parsed);
+  } catch {
+    return null;
+  }
+};
+
+export const initializeInventoryStore = () => {
+  inventoryStore = loadInventoryFromStorage() ?? cloneSeedData();
+};
+
+initializeInventoryStore();
+
+const generateDrugId = (): string => {
+  const numbers = inventoryStore.map(item => {
+    const match = item.id.match(/^DRUG(\d+)$/);
+    return match ? parseInt(match[1], 10) : 0;
+  });
+  const next = Math.max(0, ...numbers) + 1;
+  return `DRUG${String(next).padStart(3, '0')}`;
+};
+
+export const getInventoryStats = (): InventoryStats => {
+  const locations = new Set(inventoryStore.map(item => item.location));
+  return {
+    total: inventoryStore.length,
+    urgentCount: inventoryStore.filter(item => item.isUrgentReorder).length,
+    locationCount: locations.size,
+  };
+};
+
+export const getInventoryData = (): InventoryItem[] => {
+  return inventoryStore.map(item => ({
     ...item,
-    lastUpdated: new Date().toISOString()
+    lastUpdated: new Date().toISOString(),
   }));
 };
 
-export const getInventoryItem = (id: string) => {
-  return INVENTORY_DATA.find(item => item.id === id);
+export const getInventoryItem = (id: string): InventoryItem | undefined => {
+  return inventoryStore.find(item => item.id === id);
+};
+
+export const createInventoryItem = (input: InventoryItemInput): InventoryItem => {
+  const item = applyUrgentFlag({
+    id: generateDrugId(),
+    ...input,
+    lastUpdated: new Date().toISOString(),
+  });
+
+  inventoryStore = [...inventoryStore, item];
+  persistInventory();
+  return item;
+};
+
+export const updateInventoryItem = (
+  id: string,
+  input: InventoryItemInput
+): InventoryItem | null => {
+  const index = inventoryStore.findIndex(item => item.id === id);
+  if (index === -1) return null;
+
+  const updated = applyUrgentFlag({
+    ...inventoryStore[index],
+    ...input,
+    id,
+    lastUpdated: new Date().toISOString(),
+  });
+
+  inventoryStore = [
+    ...inventoryStore.slice(0, index),
+    updated,
+    ...inventoryStore.slice(index + 1),
+  ];
+  persistInventory();
+  return updated;
+};
+
+export const deleteInventoryItem = (id: string): boolean => {
+  const nextStore = inventoryStore.filter(item => item.id !== id);
+  if (nextStore.length === inventoryStore.length) return false;
+
+  inventoryStore = nextStore;
+  persistInventory();
+  return true;
+};
+
+export const resetInventoryToSeed = (): InventoryItem[] => {
+  inventoryStore = cloneSeedData();
+  persistInventory();
+  return getInventoryData();
 };

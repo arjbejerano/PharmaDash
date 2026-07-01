@@ -27,3 +27,18 @@ export interface ForecastResponse {
 
 export type AlertStatus = 'all' | 'urgent' | 'normal';
 export type LocationFilter = 'all' | string;
+
+export interface InventoryItemInput {
+  name: string;
+  currentStock: number;
+  reorderPoint: number;
+  maxStock: number;
+  location: string;
+  category: string;
+}
+
+export interface InventoryStats {
+  total: number;
+  urgentCount: number;
+  locationCount: number;
+}

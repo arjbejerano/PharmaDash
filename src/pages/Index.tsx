@@ -5,10 +5,16 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Activity, TrendingUp, Package, AlertTriangle } from 'lucide-react';
+import { InventoryStats } from '@/types/inventory';
 
 const Index = () => {
   const [selectedDrugId, setSelectedDrugId] = useState<string | null>(null);
   const [forecastOpen, setForecastOpen] = useState(false);
+  const [stats, setStats] = useState<InventoryStats>({
+    total: 25,
+    urgentCount: 12,
+    locationCount: 3,
+  });
 
   const handleSelectDrug = (drugId: string) => {
     setSelectedDrugId(drugId);
@@ -52,7 +58,7 @@ const Index = () => {
               <Package className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">25</div>
+              <div className="text-2xl font-bold">{stats.total}</div>
               <p className="text-xs text-muted-foreground">Across all locations</p>
             </CardContent>
           </Card>
@@ -62,7 +68,7 @@ const Index = () => {
               <AlertTriangle className="h-4 w-4 text-red-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-red-600">12</div>
+              <div className="text-2xl font-bold text-red-600">{stats.urgentCount}</div>
               <p className="text-xs text-muted-foreground">Below reorder point</p>
             </CardContent>
           </Card>
@@ -82,14 +88,18 @@ const Index = () => {
               <Activity className="h-4 w-4 text-blue-500" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-blue-600">3</div>
+              <div className="text-2xl font-bold text-blue-600">{stats.locationCount}</div>
               <p className="text-xs text-muted-foreground">Warehouses & hubs</p>
             </CardContent>
           </Card>
         </div>
 
         {/* Inventory Table */}
-        <InventoryTable onSelectDrug={handleSelectDrug} selectedDrugId={selectedDrugId} />
+        <InventoryTable
+          onSelectDrug={handleSelectDrug}
+          selectedDrugId={selectedDrugId}
+          onStatsChange={setStats}
+        />
 
         {/* Forecast Popup */}
         <Dialog open={forecastOpen} onOpenChange={setForecastOpen}>
