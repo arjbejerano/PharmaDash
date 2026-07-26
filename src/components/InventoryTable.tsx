@@ -244,12 +244,12 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
               <div className="text-2xl font-bold">{inventory.length}</div>
               <div className="text-sm text-muted-foreground">Total Products</div>
             </div>
-            <div className="text-center p-3 bg-red-50 rounded-lg">
-              <div className="text-2xl font-bold text-red-600">{urgentCount}</div>
+            <div className="text-center p-3 bg-muted rounded-lg">
+              <div className="text-2xl font-bold">{urgentCount}</div>
               <div className="text-sm text-muted-foreground">Urgent Reorders</div>
             </div>
-            <div className="text-center p-3 bg-green-50 rounded-lg">
-              <div className="text-2xl font-bold text-green-600">{inventory.length - urgentCount}</div>
+            <div className="text-center p-3 bg-muted rounded-lg">
+              <div className="text-2xl font-bold">{inventory.length - urgentCount}</div>
               <div className="text-sm text-muted-foreground">Normal Stock</div>
             </div>
           </div>
