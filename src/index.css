@@ -103,3 +103,25 @@ All colors MUST be HSL.
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+  .pharma-theme {
+    --background: 140 10% 7%;
+    --foreground: 120 12% 92%;
+    --card: 140 9% 12%;
+    --card-foreground: 120 12% 92%;
+    --popover: 140 9% 12%;
+    --popover-foreground: 120 12% 92%;
+    --primary: 142 72% 45%;
+    --primary-foreground: 145 20% 9%;
+    --secondary: 140 7% 17%;
+    --secondary-foreground: 120 12% 92%;
+    --muted: 140 7% 17%;
+    --muted-foreground: 132 8% 65%;
+    --accent: 140 7% 17%;
+    --accent-foreground: 120 12% 92%;
+    --border: 140 7% 21%;
+    --input: 140 7% 21%;
+    --ring: 142 72% 45%;
+  }
+}

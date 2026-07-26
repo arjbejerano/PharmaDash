@@ -1,127 +1,32 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { Activity, BarChart3, Boxes, Menu, X } from 'lucide-react';
 import { InventoryTable } from '@/components/InventoryTable';
 import { ForecastChart } from '@/components/ForecastChart';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Activity, TrendingUp, Package, AlertTriangle } from 'lucide-react';
-import { InventoryStats } from '@/types/inventory';
+import { InsightsDashboard } from '@/components/InsightsDashboard';
 import { DataAssistant } from '@/components/DataAssistant';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { InventoryStats } from '@/types/inventory';
+
+type Page = 'insights' | 'inventory';
 
 const Index = () => {
+  const [page, setPage] = useState<Page>('insights');
+  const [menuOpen, setMenuOpen] = useState(false);
   const [selectedDrugId, setSelectedDrugId] = useState<string | null>(null);
   const [forecastOpen, setForecastOpen] = useState(false);
-  const [stats, setStats] = useState<InventoryStats>({
-    total: 25,
-    urgentCount: 12,
-    locationCount: 3,
-  });
+  const [stats, setStats] = useState<InventoryStats>({ total: 25, urgentCount: 12, locationCount: 3 });
+  const selectDrug = (drugId: string) => { setSelectedDrugId(drugId); setForecastOpen(true); };
+  const navigate = (nextPage: Page) => { setPage(nextPage); setMenuOpen(false); };
+  const navigation = [{ id: 'insights' as const, label: 'Insights', icon: BarChart3 }, { id: 'inventory' as const, label: 'Inventory', icon: Boxes }];
 
-  const handleSelectDrug = (drugId: string) => {
-    setSelectedDrugId(drugId);
-    setForecastOpen(true);
-  };
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-primary rounded-lg">
-                <Activity className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">
-                  Pharma Supply Chain Dashboard by Arjay Bejerano
-                </h1>
-                <p className="text-sm text-gray-600">
-                  Real-time inventory monitoring & predictive analytics
-                </p>
-              </div>
-            </div>
-            <Badge variant="secondary" className="flex items-center gap-1">
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-              Live Data
-            </Badge>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Section */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Overview Cards (unchanged) */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Products</CardTitle>
-              <Package className="h-4 w-4 text-muted-foreground" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.total}</div>
-              <p className="text-xs text-muted-foreground">Across all locations</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Urgent Reorders</CardTitle>
-              <AlertTriangle className="h-4 w-4 text-red-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-red-600">{stats.urgentCount}</div>
-              <p className="text-xs text-muted-foreground">Below reorder point</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Forecast Accuracy</CardTitle>
-              <TrendingUp className="h-4 w-4 text-green-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-green-600">87%</div>
-              <p className="text-xs text-muted-foreground">Prophet algorithm</p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Locations</CardTitle>
-              <Activity className="h-4 w-4 text-blue-500" />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-blue-600">{stats.locationCount}</div>
-              <p className="text-xs text-muted-foreground">Warehouses & hubs</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Inventory Table */}
-        <InventoryTable
-          onSelectDrug={handleSelectDrug}
-          selectedDrugId={selectedDrugId}
-          onStatsChange={setStats}
-        />
-
-        {/* Forecast Popup */}
-        <Dialog open={forecastOpen} onOpenChange={setForecastOpen}>
-          <DialogContent className="max-w-4xl">
-            <DialogHeader>
-              <DialogTitle>7-Day Purchase Forecast</DialogTitle>
-            </DialogHeader>
-            <ForecastChart selectedDrugId={selectedDrugId} />
-          </DialogContent>
-        </Dialog>
-
-        {/* Footer */}
-        <div className="mt-6 text-center text-sm text-gray-500">
-          <p>
-            Dashboard updates every 30 seconds • Forecasts generated using Prophet algorithm • Data simulated for demonstration purposes
-          </p>
-        </div>
-      </main>
-      <DataAssistant />
-    </div>
-  );
+  return <div className="pharma-theme min-h-screen bg-background text-foreground">
+    <header className="sticky top-0 z-40 border-b border-white/10 bg-[#101511]/95 backdrop-blur"><div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8"><div className="flex items-center gap-3"><div className="rounded-xl bg-emerald-400 p-2 text-emerald-950"><Activity className="h-5 w-5" /></div><div><h1 className="text-base font-semibold sm:text-lg">Pharma<span className="text-emerald-300">Dash</span></h1><p className="hidden text-xs text-muted-foreground sm:block">Supply chain intelligence</p></div></div><nav className="hidden items-center gap-1 md:flex">{navigation.map(item => <Button key={item.id} variant="ghost" onClick={() => navigate(item.id)} className={page === item.id ? 'bg-emerald-400/15 text-emerald-300 hover:bg-emerald-400/15 hover:text-emerald-300' : 'text-muted-foreground hover:bg-white/5 hover:text-foreground'}><item.icon className="mr-2 h-4 w-4" />{item.label}</Button>)}</nav><div className="flex items-center gap-3"><Badge className="hidden border-emerald-400/20 bg-emerald-400/10 text-emerald-300 sm:flex"><span className="mr-2 h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />Live</Badge><Button variant="ghost" size="icon" className="md:hidden" onClick={() => setMenuOpen(!menuOpen)} aria-label="Toggle navigation">{menuOpen ? <X /> : <Menu />}</Button></div></div>{menuOpen && <nav className="border-t border-white/10 px-4 py-2 md:hidden">{navigation.map(item => <Button key={item.id} variant="ghost" onClick={() => navigate(item.id)} className="w-full justify-start"><item.icon className="mr-2 h-4 w-4" />{item.label}</Button>)}</nav>}</header>
+    <main className="mx-auto max-w-7xl px-4 py-7 sm:px-6 lg:px-8">{page === 'insights' ? <InsightsDashboard onOpenInventory={() => navigate('inventory')} /> : <section><div className="mb-6"><p className="text-sm font-medium uppercase tracking-[0.2em] text-emerald-300">Operations</p><h2 className="mt-2 text-3xl font-semibold">Inventory management</h2><p className="mt-2 text-sm text-muted-foreground">Manage products, locations, purchase history, and product-level forecasts.</p></div><InventoryTable onSelectDrug={selectDrug} selectedDrugId={selectedDrugId} onStatsChange={setStats} /></section>}</main>
+    <Dialog open={forecastOpen} onOpenChange={setForecastOpen}><DialogContent className="max-w-4xl border-white/10 bg-card"><DialogHeader><DialogTitle>7-Day Purchase Forecast</DialogTitle></DialogHeader><ForecastChart selectedDrugId={selectedDrugId} /></DialogContent></Dialog>
+    <DataAssistant />
+  </div>;
 };
 
 export default Index;
