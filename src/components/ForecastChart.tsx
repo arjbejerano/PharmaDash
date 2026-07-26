@@ -69,7 +69,7 @@ export const ForecastChart: React.FC<ForecastChartProps> = ({ selectedDrugId }) 
     if (!forecast) return;
     
     const csvContent = [
-      ['Date', 'Predicted Demand', 'Lower Bound', 'Upper Bound', 'Historical'].join(','),
+      ['Date', 'Predicted Purchases', 'Lower Bound', 'Upper Bound', 'Historical Purchases'].join(','),
       ...forecast.forecast.map(item => [
         item.date,
         item.predicted,
@@ -160,7 +160,7 @@ export const ForecastChart: React.FC<ForecastChartProps> = ({ selectedDrugId }) 
       },
       title: {
         display: true,
-        text: forecast ? `7-Day Demand Forecast: ${forecast.drugName}` : 'Demand Forecast',
+        text: forecast ? `7-Day Purchase Forecast: ${forecast.drugName}` : 'Purchase Forecast',
         font: {
           size: 16,
           weight: 'bold' as const,
@@ -207,14 +207,14 @@ export const ForecastChart: React.FC<ForecastChartProps> = ({ selectedDrugId }) 
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="w-5 h-5" />
-            Demand Forecast
+            Purchase Forecast
           </CardTitle>
         </CardHeader>
         <CardContent className="flex-1 flex items-center justify-center">
           <div className="text-center text-muted-foreground">
             <TrendingUp className="w-12 h-12 mx-auto mb-4 opacity-50" />
             <p className="text-lg font-medium mb-2">Select a Product</p>
-            <p>Choose a pharmaceutical product from the inventory table to view its 7-day demand forecast with confidence intervals.</p>
+            <p>Choose a product to view its 7-day supplier purchase plan with confidence intervals.</p>
           </div>
         </CardContent>
       </Card>
@@ -227,7 +227,7 @@ export const ForecastChart: React.FC<ForecastChartProps> = ({ selectedDrugId }) 
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="w-5 h-5" />
-            Demand Forecast
+            Purchase Forecast
           </CardTitle>
         </CardHeader>
         <CardContent className="flex-1 flex items-center justify-center">
@@ -281,7 +281,7 @@ export const ForecastChart: React.FC<ForecastChartProps> = ({ selectedDrugId }) 
         </div>
 
         {forecast && (
-          <div className="grid grid-cols-3 gap-4 mt-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-4">
             <div className="text-center p-3 bg-blue-50 rounded-lg">
               <div className="text-2xl font-bold text-blue-600">
                 {Math.round(forecast.confidence * 100)}%
@@ -290,13 +290,17 @@ export const ForecastChart: React.FC<ForecastChartProps> = ({ selectedDrugId }) 
             </div>
             <div className="text-center p-3 bg-green-50 rounded-lg">
               <div className="text-2xl font-bold text-green-600">{totalPredicted}</div>
-              <div className="text-sm text-muted-foreground">7-Day Total</div>
+              <div className="text-sm text-muted-foreground">7-Day Purchase Plan</div>
             </div>
             <div className="text-center p-3 bg-purple-50 rounded-lg">
               <div className="text-2xl font-bold text-purple-600">
                 {Math.round(totalPredicted / 7)}
               </div>
               <div className="text-sm text-muted-foreground">Daily Average</div>
+            </div>
+            <div className="text-center p-3 bg-amber-50 rounded-lg">
+              <div className="text-2xl font-bold text-amber-600">{forecast.trainingDataPoints}</div>
+              <div className="text-sm text-muted-foreground">Recorded days</div>
             </div>
           </div>
         )}
@@ -305,7 +309,7 @@ export const ForecastChart: React.FC<ForecastChartProps> = ({ selectedDrugId }) 
           <div className="flex items-center gap-2 mt-4">
             <Calendar className="w-4 h-4" />
             <span className="text-sm text-muted-foreground">
-              Forecast Period: {new Date().toLocaleDateString()} - {new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString()}
+              Purchase plan: {new Date().toLocaleDateString()} - {new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString()}
             </span>
             <Badge variant="secondary" className="ml-2">
               <Target className="w-3 h-3 mr-1" />

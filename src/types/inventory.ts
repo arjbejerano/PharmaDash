@@ -23,6 +23,13 @@ export interface ForecastResponse {
   drugName: string;
   forecast: ForecastData[];
   confidence: number;
+  trainingDataPoints: number;
+}
+
+export interface PurchaseRecord {
+  drugId: string;
+  date: string;
+  units: number;
 }
 
 export type AlertStatus = 'all' | 'urgent' | 'normal';

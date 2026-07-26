@@ -40,6 +40,15 @@ It combines **real-time stock monitoring**, **AI-inspired demand forecasting**, 
 
 ---
 
+## OpenAI assistant setup
+
+The dashboard assistant uses the OpenAI Responses API through the `ai-assistant` Supabase Edge Function. The browser sends a compact dashboard-data snapshot; the OpenAI key remains server-side.
+
+1. Deploy `supabase/functions/ai-assistant` to your Supabase project with `supabase functions deploy ai-assistant`.
+2. Run `supabase secrets set OPENAI_API_KEY=your_key`.
+3. Copy `.env.example` to `.env.local`, then set the deployed function URL and your project's public Supabase anon key.
+4. Restart the Vite app after changing the environment file.
+
 ## 🛠️ Technical Implementation
 
 ### 🧱 Frontend Architecture

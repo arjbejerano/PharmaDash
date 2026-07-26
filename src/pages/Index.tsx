@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Activity, TrendingUp, Package, AlertTriangle } from 'lucide-react';
 import { InventoryStats } from '@/types/inventory';
+import { DataAssistant } from '@/components/DataAssistant';
 
 const Index = () => {
   const [selectedDrugId, setSelectedDrugId] = useState<string | null>(null);
@@ -105,7 +106,7 @@ const Index = () => {
         <Dialog open={forecastOpen} onOpenChange={setForecastOpen}>
           <DialogContent className="max-w-4xl">
             <DialogHeader>
-              <DialogTitle>7-Day Demand Forecast</DialogTitle>
+              <DialogTitle>7-Day Purchase Forecast</DialogTitle>
             </DialogHeader>
             <ForecastChart selectedDrugId={selectedDrugId} />
           </DialogContent>
@@ -118,6 +119,7 @@ const Index = () => {
           </p>
         </div>
       </main>
+      <DataAssistant />
     </div>
   );
 };

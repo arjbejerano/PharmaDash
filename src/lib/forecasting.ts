@@ -1,4 +1,4 @@
-import { ForecastData } from '@/types/inventory';
+import { ForecastData, PurchaseRecord } from '@/types/inventory';
 
 // Simulate Prophet-like forecasting algorithm
 export class ForecastingEngine {
@@ -9,18 +9,18 @@ export class ForecastingEngine {
     return weeklyPattern + monthlyPattern;
   }
 
-  private generateTrend(baseValue: number, days: number): number {
-    // Simulate slight upward or downward trend
-    const trendFactor = 0.002; // 0.2% daily trend
-    return baseValue * (1 + (Math.random() - 0.5) * trendFactor * days);
+  private estimateForDate(date: Date, baseValue: number, history: PurchaseRecord[]): number {
+    if (history.length === 0) return baseValue;
+    const weekday = date.getDay();
+    const matchingWeekday = history.filter(record => new Date(`${record.date}T12:00:00`).getDay() === weekday);
+    const comparable = matchingWeekday.length >= 2 ? matchingWeekday : history;
+    const weightedTotal = comparable.reduce((sum, record, index) => sum + record.units * Math.max(1, comparable.length - index), 0);
+    const totalWeight = comparable.reduce((sum, _, index) => sum + Math.max(1, comparable.length - index), 0);
+    const dayOfYear = Math.floor((date.getTime() - new Date(date.getFullYear(), 0, 0).getTime()) / 86400000);
+    return Math.max(0, Math.round((weightedTotal / totalWeight) * (1 + this.generateSeasonality(dayOfYear))));
   }
 
-  private generateNoise(): number {
-    // Add realistic noise to predictions
-    return (Math.random() - 0.5) * 0.1;
-  }
-
-  generateForecast(drugId: string, baseConsumption: number, days: number = 7): ForecastData[] {
+  generateForecast(drugId: string, baseConsumption: number, history: PurchaseRecord[] = [], days: number = 7): ForecastData[] {
     const forecast: ForecastData[] = [];
     const today = new Date();
     
@@ -29,15 +29,12 @@ export class ForecastingEngine {
       const date = new Date(today);
       date.setDate(date.getDate() + i);
       
-      const dayOfYear = Math.floor((date.getTime() - new Date(date.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
-      const seasonality = this.generateSeasonality(dayOfYear);
-      const trend = this.generateTrend(baseConsumption, Math.abs(i));
-      const noise = this.generateNoise();
-      
-      const historical = Math.max(0, Math.round(trend + seasonality * baseConsumption + noise * baseConsumption));
+      const dateKey = date.toISOString().split('T')[0];
+      const historicalRecord = history.find(record => record.date === dateKey);
+      const historical = historicalRecord?.units ?? this.estimateForDate(date, baseConsumption, history);
       
       forecast.push({
-        date: date.toISOString().split('T')[0],
+        date: dateKey,
         predicted: historical,
         lower: historical * 0.8,
         upper: historical * 1.2,
@@ -50,12 +47,7 @@ export class ForecastingEngine {
       const date = new Date(today);
       date.setDate(date.getDate() + i);
       
-      const dayOfYear = Math.floor((date.getTime() - new Date(date.getFullYear(), 0, 0).getTime()) / (1000 * 60 * 60 * 24));
-      const seasonality = this.generateSeasonality(dayOfYear);
-      const trend = this.generateTrend(baseConsumption, i);
-      const noise = this.generateNoise();
-      
-      const predicted = Math.max(0, Math.round(trend + seasonality * baseConsumption + noise * baseConsumption));
+      const predicted = this.estimateForDate(date, baseConsumption, history);
       const confidenceInterval = predicted * 0.15; // 15% confidence interval
       
       forecast.push({
@@ -74,7 +66,7 @@ export class ForecastingEngine {
     const predictions = forecast.filter(f => !f.historical).map(f => f.predicted);
     const mean = predictions.reduce((sum, val) => sum + val, 0) / predictions.length;
     const variance = predictions.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) / predictions.length;
-    const coefficient = Math.sqrt(variance) / mean;
+    const coefficient = mean === 0 ? 1 : Math.sqrt(variance) / mean;
     
     // Convert coefficient of variation to confidence percentage (inverse relationship)
     return Math.max(0.6, Math.min(0.95, 1 - coefficient));

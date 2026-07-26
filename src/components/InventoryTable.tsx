@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import {
   AlertDialog,
@@ -15,10 +16,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { AlertTriangle, Package, MapPin, Clock, Plus, Pencil, Trash2 } from 'lucide-react';
+import { AlertTriangle, Package, MapPin, Clock, Plus, Pencil, Trash2, MoreHorizontal, ShoppingCart, Settings } from 'lucide-react';
 import { toast } from 'sonner';
 import { mockApiService } from '@/lib/mock-api';
 import { InventoryFormDialog, InventoryFormValues } from '@/components/InventoryFormDialog';
+import { PurchaseHistoryDialog } from '@/components/PurchaseHistoryDialog';
+import { LocationManagerDialog } from '@/components/LocationManagerDialog';
 
 interface InventoryTableProps {
   onSelectDrug: (drugId: string) => void;
@@ -42,6 +45,9 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
   const [deleteTarget, setDeleteTarget] = useState<InventoryItem | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [purchaseItem, setPurchaseItem] = useState<InventoryItem | null>(null);
+  const [locationManagerOpen, setLocationManagerOpen] = useState(false);
+  const [managedLocations, setManagedLocations] = useState<string[]>([]);
 
   const emitStats = useCallback((items: InventoryItem[]) => {
     const locations = new Set(items.map(item => item.location));
@@ -78,6 +84,12 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
     return () => clearInterval(interval);
   }, [fetchInventory]);
 
+  useEffect(() => {
+    mockApiService.getLocations().then(result => {
+      if (result.success) setManagedLocations(result.data ?? []);
+    });
+  }, []);
+
   const filteredInventory = inventory.filter(item => {
     const alertMatch = alertFilter === 'all' ||
       (alertFilter === 'urgent' && item.isUrgentReorder) ||
@@ -89,7 +101,7 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
   });
 
   const urgentCount = inventory.filter(item => item.isUrgentReorder).length;
-  const locations = [...new Set(inventory.map(item => item.location))];
+  const locations = [...new Set([...managedLocations, ...inventory.map(item => item.location)])];
   const categories = [...new Set(inventory.map(item => item.category))];
 
   const openCreateDialog = () => {
@@ -220,6 +232,10 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
                 <Plus className="w-4 h-4 mr-1" />
                 Add Product
               </Button>
+              <Button onClick={() => setLocationManagerOpen(true)} size="sm" variant="outline">
+                <Settings className="w-4 h-4 mr-1" />
+                Locations
+              </Button>
             </div>
           </div>
 
@@ -315,23 +331,28 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
                       >
                         Forecast
                       </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => openEditDialog(item)}
-                        aria-label={`Edit ${item.name}`}
-                      >
-                        <Pencil className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="text-red-600 hover:text-red-700"
-                        onClick={() => setDeleteTarget(item)}
-                        aria-label={`Delete ${item.name}`}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button size="sm" variant="outline" aria-label={`Manage ${item.name}`}>
+                            <MoreHorizontal className="w-4 h-4 mr-1" />
+                            Manage
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" side="top" sideOffset={8}>
+                          <DropdownMenuItem onSelect={() => setPurchaseItem(item)}>
+                            <ShoppingCart className="w-4 h-4 mr-2" />
+                            Purchases
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onSelect={() => openEditDialog(item)}>
+                            <Pencil className="w-4 h-4 mr-2" />
+                            Edit product & location
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-red-600 focus:text-red-600" onSelect={() => setDeleteTarget(item)}>
+                            <Trash2 className="w-4 h-4 mr-2" />
+                            Delete product
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -356,6 +377,22 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
         categories={categories}
         onSubmit={handleFormSubmit}
         isSubmitting={isSubmitting}
+      />
+
+      <PurchaseHistoryDialog
+        open={!!purchaseItem}
+        onOpenChange={(open) => !open && setPurchaseItem(null)}
+        drugId={purchaseItem?.id ?? null}
+        drugName={purchaseItem?.name ?? null}
+      />
+
+      <LocationManagerDialog
+        open={locationManagerOpen}
+        onOpenChange={setLocationManagerOpen}
+        onLocationsChange={(nextLocations) => {
+          setManagedLocations(nextLocations);
+          fetchInventory(false);
+        }}
       />
 
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>

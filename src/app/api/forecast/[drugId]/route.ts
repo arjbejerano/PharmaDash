@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getInventoryItem } from '@/lib/inventory-data';
 import { forecastingEngine } from '@/lib/forecasting';
 import { ForecastResponse } from '@/types/inventory';
+import { getPurchaseRecords } from '@/lib/purchase-data';
 
 export async function GET(
   request: NextRequest,
@@ -25,15 +26,16 @@ export async function GET(
     // Calculate base consumption based on current stock and reorder point
     const baseConsumption = Math.max(5, Math.round((inventoryItem.maxStock - inventoryItem.currentStock) / 30));
     
-    // Generate forecast using our Prophet-like algorithm
-    const forecast = forecastingEngine.generateForecast(drugId, baseConsumption, 7);
+    const purchases = getPurchaseRecords(drugId);
+    const forecast = forecastingEngine.generateForecast(drugId, baseConsumption, purchases, 7);
     const confidence = forecastingEngine.calculateConfidence(forecast);
     
     const response: ForecastResponse = {
       drugId: inventoryItem.id,
       drugName: inventoryItem.name,
       forecast,
-      confidence: Math.round(confidence * 100) / 100
+      confidence: Math.round(confidence * 100) / 100,
+      trainingDataPoints: purchases.length
     };
     
     return NextResponse.json({

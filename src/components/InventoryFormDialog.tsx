@@ -48,7 +48,6 @@ const inventoryFormSchema = z
 
 export type InventoryFormValues = z.infer<typeof inventoryFormSchema>;
 
-const DEFAULT_LOCATIONS = ['Warehouse A', 'Distribution Hub B', 'Warehouse C'];
 const DEFAULT_CATEGORIES = [
   'Antibiotics',
   'Pain Relief',
@@ -80,7 +79,7 @@ const emptyValues: InventoryFormValues = {
   currentStock: 0,
   reorderPoint: 0,
   maxStock: 100,
-  location: DEFAULT_LOCATIONS[0],
+  location: '',
   category: DEFAULT_CATEGORIES[0],
 };
 
@@ -114,10 +113,10 @@ export const InventoryFormDialog: React.FC<InventoryFormDialogProps> = ({
       return;
     }
 
-    form.reset(emptyValues);
-  }, [open, mode, item, form]);
+    form.reset({ ...emptyValues, location: locations[0] ?? '' });
+  }, [open, mode, item, form, locations]);
 
-  const locationOptions = [...new Set([...DEFAULT_LOCATIONS, ...locations])];
+  const locationOptions = locations;
   const categoryOptions = [...new Set([...DEFAULT_CATEGORIES, ...categories])];
 
   const handleSubmit = form.handleSubmit(async values => {
