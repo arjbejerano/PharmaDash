@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { InventoryItem, AlertStatus, LocationFilter, InventoryStats } from '@/types/inventory';
+import { InventoryItem, InventoryItemInput, AlertStatus, LocationFilter, InventoryStats } from '@/types/inventory';
+import { getAutomationActions } from '@/lib/inventory-data';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -16,7 +17,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { AlertTriangle, Package, MapPin, Clock, Plus, Pencil, Trash2, MoreHorizontal, ShoppingCart, Settings } from 'lucide-react';
+import { AlertTriangle, Package, MapPin, Clock, Plus, Pencil, Trash2, MoreHorizontal, ShoppingCart, Settings, Zap } from 'lucide-react';
 import { toast } from 'sonner';
 import { mockApiService } from '@/lib/mock-api';
 import { InventoryFormDialog, InventoryFormValues } from '@/components/InventoryFormDialog';
@@ -103,6 +104,7 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
   const urgentCount = inventory.filter(item => item.isUrgentReorder).length;
   const locations = [...new Set([...managedLocations, ...inventory.map(item => item.location)])];
   const categories = [...new Set(inventory.map(item => item.category))];
+  const automationActions = getAutomationActions(inventory);
 
   const openCreateDialog = () => {
     setFormMode('create');
@@ -120,9 +122,18 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
     setIsSubmitting(true);
 
     try {
+      const payload: InventoryItemInput = {
+        name: values.name ?? '',
+        currentStock: values.currentStock ?? 0,
+        reorderPoint: values.reorderPoint ?? 0,
+        maxStock: values.maxStock ?? 100,
+        location: values.location ?? '',
+        category: values.category ?? '',
+      };
+
       const result = formMode === 'create'
-        ? await mockApiService.createInventory(values)
-        : await mockApiService.updateInventory(editingItem!.id, values);
+        ? await mockApiService.createInventory(payload)
+        : await mockApiService.updateInventory(editingItem!.id, payload);
 
       if (result.success) {
         toast.success(formMode === 'create' ? 'Product added' : 'Product updated');
@@ -251,6 +262,39 @@ export const InventoryTable: React.FC<InventoryTableProps> = ({
             <div className="text-center p-3 bg-muted rounded-lg">
               <div className="text-2xl font-bold">{inventory.length - urgentCount}</div>
               <div className="text-sm text-muted-foreground">Normal Stock</div>
+            </div>
+          </div>
+
+          <div className="mt-4 rounded-lg border border-emerald-700/70 bg-black/90 p-4 shadow-[0_0_0_1px_rgba(16,185,129,0.15)]">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Zap className="h-4 w-4 text-emerald-400" />
+                <h3 className="font-semibold text-emerald-300">Automation Center</h3>
+              </div>
+              <span className="text-sm text-emerald-400">{automationActions.length} automated workflow{automationActions.length === 1 ? '' : 's'} active</span>
+            </div>
+            <p className="mt-2 text-sm text-slate-300">
+              The system automatically creates replenishment workflows for urgent and low-stock inventory items.
+            </p>
+            <div className="mt-3 grid gap-3 md:grid-cols-2">
+              {automationActions.map(action => (
+                <div key={action.id} className="rounded-md border border-emerald-800/70 bg-zinc-950/90 p-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="font-medium text-white">{action.title}</p>
+                      <p className="mt-1 text-sm text-slate-300">{action.description}</p>
+                    </div>
+                    <Badge variant={action.severity === 'high' ? 'destructive' : 'secondary'}>{action.status}</Badge>
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {action.workflow.map(step => (
+                      <span key={step.id} className="rounded-full bg-emerald-900/80 px-2.5 py-1 text-xs text-emerald-200">
+                        {step.label} • {step.status}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 

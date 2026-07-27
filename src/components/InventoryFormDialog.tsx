@@ -46,7 +46,14 @@ const inventoryFormSchema = z
     path: ['currentStock'],
   });
 
-export type InventoryFormValues = z.infer<typeof inventoryFormSchema>;
+export type InventoryFormValues = {
+  name: string;
+  currentStock: number;
+  reorderPoint: number;
+  maxStock: number;
+  location: string;
+  category: string;
+};
 
 const DEFAULT_CATEGORIES = [
   'Antibiotics',

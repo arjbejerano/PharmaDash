@@ -10,8 +10,12 @@ export const initializeLocationStore = () => {
   if (typeof window === 'undefined') return;
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '[]');
-    if (Array.isArray(saved) && saved.every(value => typeof value === 'string' && value.trim())) locationStore = saved;
-  } catch { locationStore = [...INITIAL_LOCATIONS]; }
+    if (Array.isArray(saved) && saved.length && saved.every(value => typeof value === 'string' && value.trim())) {
+      locationStore = saved;
+    } else {
+      locationStore = [...new Set([...INITIAL_LOCATIONS, ...getInventoryData().map(item => item.location)])];
+    }
+  } catch { locationStore = [...new Set([...INITIAL_LOCATIONS, ...getInventoryData().map(item => item.location)])]; }
 };
 initializeLocationStore();
 

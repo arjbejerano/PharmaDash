@@ -49,3 +49,23 @@ export interface InventoryStats {
   urgentCount: number;
   locationCount: number;
 }
+
+export type AutomationStatus = 'Triggered' | 'Queued' | 'Completed';
+
+export interface AutomationWorkflowStep {
+  id: string;
+  label: string;
+  status: AutomationStatus;
+}
+
+export interface AutomationAction {
+  id: string;
+  itemId: string;
+  itemName: string;
+  title: string;
+  description: string;
+  severity: 'high' | 'medium' | 'low';
+  status: AutomationStatus;
+  workflow: AutomationWorkflowStep[];
+  createdAt: string;
+}

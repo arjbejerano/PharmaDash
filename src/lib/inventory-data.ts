@@ -1,4 +1,4 @@
-import { InventoryItem, InventoryItemInput, InventoryStats } from '@/types/inventory';
+import { AutomationAction, InventoryItem, InventoryItemInput, InventoryStats } from '@/types/inventory';
 
 const STORAGE_KEY = 'pharmadash-inventory';
 
@@ -341,6 +341,36 @@ export const getInventoryStats = (): InventoryStats => {
     urgentCount: inventoryStore.filter(item => item.isUrgentReorder).length,
     locationCount: locations.size,
   };
+};
+
+export const getAutomationActions = (items: InventoryItem[] = inventoryStore): AutomationAction[] => {
+  const createdAt = new Date().toISOString();
+
+  return items
+    .filter(item => item.isUrgentReorder || item.currentStock < item.maxStock * 0.3)
+    .slice(0, 4)
+    .map((item, index) => {
+      const severity = item.currentStock <= item.reorderPoint / 2 ? 'high' : 'medium';
+      const workflow = [
+        { id: `${item.id}-monitor`, label: 'Monitor stock threshold', status: 'Completed' as const },
+        { id: `${item.id}-trigger`, label: 'Trigger reorder recommendation', status: item.isUrgentReorder ? 'Triggered' as const : 'Queued' as const },
+        { id: `${item.id}-notify`, label: 'Notify procurement team', status: index === 0 ? 'Queued' as const : 'Completed' as const },
+      ];
+
+      return {
+        id: `${item.id}-automation-${index + 1}`,
+        itemId: item.id,
+        itemName: item.name,
+        title: item.isUrgentReorder ? 'Urgent replenishment workflow' : 'Demand review workflow',
+        description: item.isUrgentReorder
+          ? `Auto-generated replenishment request for ${item.name} because stock is at or below the reorder point.`
+          : `Auto-generated demand review for ${item.name} because stock is trending low relative to max capacity.`,
+        severity,
+        status: item.isUrgentReorder ? 'Triggered' as const : 'Queued' as const,
+        workflow,
+        createdAt,
+      };
+    });
 };
 
 export const getInventoryData = (): InventoryItem[] => {
